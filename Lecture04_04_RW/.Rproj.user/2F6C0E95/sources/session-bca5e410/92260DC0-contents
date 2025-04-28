@@ -1,0 +1,113 @@
+---
+output: "pdf_document"
+editor_options: 
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65),
+  tidy=TRUE
+)
+```
+
+CSI 2300: Intro to Data Science
+
+In-Class Exercise 04:  Introduction to R and RStudio
+
+
+
+<!-- \begin{center} -->
+<!-- Lecture -->
+<!-- \end{center} -->
+
+
+
+The data for today's exercises are the Colorado Covid-19 data used in the lecture.
+
+
+
+
+
+1. Download the data, and then load it into R.  To verify that this has been accomplished, show the column names of the data frame, using the `colnames()` command.
+
+```{r getDATA}
+df <- read.csv("dat/CDPHE_COVID19_Wastewater_Dashboard_Data.csv")
+colnames(df)
+```
+
+
+
+2. Let's do some light data wrangling of this dataset.  First, remove the  redundant last column, and overwrite the dataset name with this new dataset containing 4 instead of 5 columns. Show the first 6 rows of the updated dataset to demonstrate.
+
+```{r}
+head(df)
+```
+
+
+
+3. The names of the last two columns could be better.  Replace the existing names with the names `sars_rna_copies` and `new_covid_cases`.
+```{r}
+
+```
+
+
+
+
+4. How many missing values are there in the `sars_rna_copies` variable?  What proportion of the dataset is this?
+
+
+5.  Another issue with the data is that when the count of new cases of Covid-19 is less than 5, the count of new cases is reported as 0 to maintain patient privacy.  Filter the data so that only non-NA `sars_rna_copies` are present AND all `new_covid_cases` are 5 or greater. Show the first few rows of this new data frame to demonstrate that you filtered out the undesirable rows.
+
+
+
+6. Let's do a simple plot of the `new_covid_cases` versus `sars_rna_copies` using the filtered data.  Given that we expect the number of new cases to  depend on the RNA copies measured, put `new_covid_cases` on the y-axis and `sars_rna_copies` on the x-axis. Comment on what you observe in this plot.
+
+
+
+
+
+7. Add  nicer labels to the plot by including the arguments `xlab="X Label"` and `ylab="Y Label"` and `main="Overall Title"` in the plot command.  Change the labels to something appropriate for this figure.
+
+
+
+8.  A lot of the points are squished into  the bottom left of the figure. They can be spread apart to see the relationship between the two variables more clearly by applying the log to each of the variables.  Replot the figure applying the `log()` function to each variable.  
+
+
+9. Describe what you see in the figure from the prior question.
+
+
+10.  Now, let's go back to the full dataset and examine the new case counts in one county, Boulder county.  First, filter the data to obtain just the Boulder utility's observations. Then, sort the `new_covid_cases` from smallest to largest.  What do you observe?
+
+
+
+
+11.  Now we want to plot the new covid cases for Boulder over time, similar to the website where the data are reported^[https://cdphe.maps.arcgis.com/apps/opsdashboard/index.html#/d79cf93c3938470ca4bcc4823328946b]. To do this, we want to plot the date on the x-axis and the number of new cases on the y-axis with the following additional instructions:
+
+* install and load the `lubridate` library
+* wrap `covid_boulder$Date` with the `mdy()` command from the `lubridate` library, which can then be used as the variable to plot on the x-axis.
+* inside the `plot()` command, add the argument `type="l"`
+* add sensible labels to x and y axes
+
+
+
+12.  The lines in the prior plot should not be criss-crossing over themselves. What is the cause of this problem?  See if you can fix it.  You may find the `order()` command to be useful.
+
+
+13. What patterns do you observe in the plot from the prior question?
+
+
+
+
+
+

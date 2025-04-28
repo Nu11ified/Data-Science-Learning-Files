@@ -1,0 +1,116 @@
+/* General Body Styling */
+body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+html {
+  height: 100%;
+  overflow: auto; /* Ensure scrolling works properly */
+}
+
+/* Main Content Wrapper */
+#content {
+  position: relative;
+  z-index: 10;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: #ffcc00; /* Golden color for headings */
+  text-shadow: 0 0 10px #ffcc00;
+}
+
+/* Links */
+a {
+  color: #00aaff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Starfield Background */
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: black;
+  overflow: hidden;
+  pointer-events: none; /* Prevent interference with scrolling */
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 2s infinite ease-in-out, fall 5s linear infinite;
+}
+
+/* Star Twinkle Effect */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Star Falling Effect */
+@keyframes fall {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(100vh) scale(0.5);
+  }
+}
+
+/* Text and Table Styling */
+p {
+  margin: 10px 0;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+th, td {
+  border: 1px solid white;
+  padding: 8px;
+  text-align: left;
+}
+
+code {
+  background: #222;
+  color: #00ff99;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+pre {
+  background: #222;
+  color: #00ff99;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+}

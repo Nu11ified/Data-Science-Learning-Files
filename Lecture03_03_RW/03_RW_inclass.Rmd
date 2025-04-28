@@ -1,0 +1,132 @@
+---
+title: "Getting to Know Markdown"
+author: "Manas Reddy"
+date: "2024-08-28"
+output:
+  pdf_document: default
+  html_document:
+    theme: null
+    highlight: null
+    css: styles.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+<div class="stars"></div>
+<div id="content">
+**Knit early and often!!** 
+
+**Save your file somewhere where you can find it in a reasonably tidy folder structure!** 
+
+1. Read in the dataset classProfiles.csv and generate a boxplot showing the distribution of each of the skills. Edit one or more of the visual aspects of this plot (Ex: change the color, add a title, change the ylim, add the outliers, make the x-axis labels vertical for a challenge in base R.)
+
+```{r}
+df <- read.csv("dat/classProfiles.csv")
+
+boxplot(df, col = "blue")
+```
+  
+2. Write at minimum two paragraphs about your goals for the class and for your work in data science more broadly. (No more than a page please.) This can be an elaboration on one element of the skills listed above. Tell me the story of how you came to be a fledgling data scientist. What made you sign up for this course? What brought you to Baylor? 
+
+(what follows below is a sample! Plz delete and write your own paragraphs!
+)
+### Data science is interesting
+
+Here's a transformed version of your content that incorporates all the elements you requested:
+
+---
+
+## Table of Contents
+
+1. **Background**
+   - Education
+   - Interests 
+2. **Reason for Taking This Class**
+   - Goals for the Course
+   - Previous Challenges
+
+---
+
+## **1. Background**
+
+### 1.1 Education  
+- **Major**:  
+   I was a pre-law Political Science major at **Baylor University** because I initially wanted to become a lawyer.  
+
+- **Interest in Political Science**:  
+   Through the classes I’ve taken, I realized that while I do really enjoy the field of Political Science, my passion lies more in analyzing and researching **society**. Specifically, I enjoy examining **how interactions between political decisions, such as public policy, affect the real world**.  
+
+### 1.2 Interests
+- **Coding Experience**:  
+   In addition to my academic interests, I’ve developed a strong interest in coding. I have taught myself **Python** and **JavaScript**, focusing primarily on **web development**.
+
+> *"The ability to bridge political analysis and technical skills opens unique opportunities in understanding societal changes."*  
+
+---
+
+## **2. Reason for Taking This Class**
+
+### 2.1 Goals for the Course  
+1. To familiarize myself with **data science** and its applications.  
+2. To demonstrate my commitment to this field by working on **real technical use cases**.  
+3. To gain proficiency in **R programming** as it’s crucial for analyzing political datasets.  
+
+### 2.2 Previous Challenges  
+- When I took a Political Science Research class, a lot of the datasets I encountered for my project were available in **R** so it would of been easier to analyze them.  
+
+### A Math Formula I’d Like to Learn  
+
+The regression formula:  
+
+\[
+y = \beta_0 + \beta_1x_1 + \beta_2x_2 + \dots + \beta_kx_k + \epsilon
+\]
+
+
+---
+
+### **Key Takeaway**  
+
+**By combining** my Political Science background with newly developed technical skills, I hope to contribute to societal research in a more meaningful and **data-driven way**.  
+
+---
+
+#### Ordered List (Goals):  
+1. Learn R programming.  
+2. Master technical data use cases.  
+3. Bridge political analysis and data science.
+
+#### Unordered List (Interests):  
+- Public Policy Analysis  
+- Research and Societal Impact  
+- Coding (Python & JavaScript)
+
+---
+
+| **Skill**          | **Proficiency Level**    | **Field of Use**           |  
+|---------------------|-----------------------|-----------------------------|  
+| Python & Javascript | Beginner              | Web Dev                     |  
+| Political Science   | Advanced              | Public Policy Research      |  
+---
+
+
+
+3. Format your paragraphs with some markdown. For full credit you must use at least five of the following formatting elements:
+
+- An ordered list
+- An unordered list
+- A math formula
+- Bold/underlined/italicized text
+- An embedded link
+- A block quote
+- Sections and subsections
+- A table of contents. 
+ 
+Feel free to be creative with this! For example: block quote your personal manifesto, give me an ordered list of ideal elements of the perfect coding environment! (Again, my examples have been given above, but delete and fill in with your own!)
+
+4. (Optional but fun) Alter the theme in your YAML heading with Bootswatch
+<https://bookdown.org/yihui/rmarkdown/html-document.html#appearance-and-style>
+
+6. Knit to PDF and submit to Canvas!
+</div>

@@ -1,0 +1,260 @@
+---
+output: "pdf_document"
+editor_options:
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#",
+  cache = FALSE,
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65)
+)
+
+# for reproducible results when using random methods (k-means initialization is
+# randomized)
+set.seed(1)
+```
+
+# CSI 2300: Intro to Data Science
+
+## In-Class Exercise 23: Modeling -- Clustering and Multidimensional Scaling
+
+In this lecture, we're going to work with a mystery dataset and try to unlock
+some of the patterns it contains. The mystery dataset is from one of the mowater
+datasets, but it has been sub-sampled and some variables removed to protect its
+identity (and make it easier to work with). There's a lot to do, so get going!
+
+1. Load and scale the dataset.
+
+    - Load in the dataset you were given in the `rda` file. The data frame
+      contained has the mysterious name "lecture23".
+    - It's important to manage the scale of our variables in distance-based
+      methods, otherwise variables that have a large range can dominate the
+      distance calculations.  Use `as.data.frame(scale(lecture23))` command to
+      change each variable to have $0$ mean and standard deviation of $1$.
+      Replace your data (`lecture23`) with the output of that scaling.
+    - Check your work: run `sapply(lecture23, mean)` and 
+      `sapply(lecture23, sd)`, and you should get values near zero and one.
+      
+```{r}
+load("lecture_23_inclass.rda")       
+lecture23 <- as.data.frame(scale(lecture23))
+sapply(lecture23, mean)
+sapply(lecture23, sd)
+
+pairs(
+  lecture23,
+  panel = panel.smooth,
+  main  = "Pairs Plot of Scaled Variables"
+)
+
+```
+
+
+
+2. You've been given "original space" data. Explore this data by plotting some
+   of its variables. You may find the `pairs` function useful. Do you notice any
+   clusters? It may be hard to tell (because this data has more than two
+   variables), but how many clusters do you think you see (just give an
+   estimate)?
+   
+
+
+
+3. Construct the pairwise distance matrix, and then use it to construct a
+   two-dimensional visualization using multidimensional scaling.
+
+    - Construct the pairwise distance matrix, and save it in a variable called
+      `pairwise_dist`. 
+    - Use multidimensional scaling to produce a 2-dimensional view of the
+      `pairwise_dist` matrix you just created. Let's call this 2-dimensional
+      version `mds_2d`.
+    - Then plot `mds_2d`. Do you see clusters?  How many clusters do you see?
+
+```{r}
+pairwise_dist <- dist(lecture23)
+
+mds_2d <- cmdscale(pairwise_dist, k = 2, eig = TRUE)
+
+mds_points <- as.data.frame(mds_2d$points)
+colnames(mds_points) <- c("Dim1", "Dim2")
+
+plot(
+  mds_points$Dim1,
+  mds_points$Dim2,
+  xlab = "MDS Dimension 1",
+  ylab = "MDS Dimension 2",
+  main = "2D MDS of lecture23",
+  pch = 19
+)
+```
+
+I see three main clusters with 2 having a large amount of dots and the two clusters are right next to eachother, and the 3rd being off to the side with the dots being more spread apart.
+
+4. Cluster the original-space data using $k$-means. 
+
+    - Cluster `lecture23` with each value of $k$ from $2$ up to $20$.
+    - For each $k$, record the distortion (available as the field
+      `$tot.withinss` from the model).
+    - Make a plot of the distortion as a function of $k$.
+    - Based on this plot, how many clusters do you think there are in the data?
+      Look for a low distortion, but good vertical separation between the
+      distortion for your chosen $k$ and the distortion for $k-1$.
+      
+```{r}
+ks <- 2:20
+wss <- numeric(length(ks))
+
+for (i in ks) {
+  set.seed(123)  
+  km <- kmeans(lecture23, centers = i, nstart = 10)
+  wss[i - 1] <- km$tot.withinss
+}
+
+plot(ks, wss, type = "b",
+     xlab = "Number of clusters k",
+     ylab = "Total within‐cluster SS",
+     main = "Elbow Plot: k‐means Distortion")
+```
+
+I there is just one elbow at 3, and then it starts to go down more slowly. I would choose 3 clusters. 
+
+5. The distortion values tend to "just go down" as you add more clusters. We can
+   use a *penalized* distortion with the BIC (Bayesian Information Criterion). 
+   The computation is:
+
+   $$\text{BIC}(k) = \text{distortion(k)} + (k-1 + k \cdot d) \cdot \log(n)$$
+
+   where $k$ is the number of clusters, $d$ is the number of dimensions
+   (variables), and $n$ is the number of observations.  The penalty is based on
+   the number of parameters estimated ($k-1$ "cluster priors" and $k\cdot d$ parameters
+   for the cluster centers), and we multiply them by the BIC penalty $\log(n)$. 
+
+   - Compute the BIC-penalized distortion according to the formula above and
+     your distortion values from the previous question.
+   - Plot the BIC-penalized distortion as a function of $k$.  What $k$ would you
+     choose based on that plot? Is it different than what you chose in the
+     previous question?
+     
+```{r}
+n <- nrow(lecture23)
+d <- ncol(lecture23)
+bic_vals <- wss + ((ks - 1) + ks * d) * log(n)
+
+plot(ks, bic_vals, type = "b",
+     xlab = "Number of clusters k",
+     ylab = "BIC‐penalized distortion",
+     main = "BIC vs k for k‐means")
+```
+
+I would choose 3 clusters again. The BIC-penalized distortion is lower at 3 than at 4, and then it starts to go up again.
+
+6. Let's visualize the $k$-means clustering. For ease of grading, we'll choose
+   $k = 3$ (though you may have chosen a different $k$ in the previous
+   questions).
+
+   - Cluster the `lecture23` data using $k$-means with $k = 3$, and save the
+     model in a variable.
+   - Plot `lecture23` variables `x2` and `x5`, and color the points using
+     the cluster labels. 
+   - Plot the `mds_2d` data, coloring the points using the cluster labels.
+   - Do the clusters look reasonable? Keep in mind that we are clustering with 8
+     variables, but plotting in 2 dimensions, so some clusters may appear to
+     overlap -- that's because we are not plotting all the dimensions (and the
+     un-plotted dimensions get "collapsed" or "projected" down onto the two that
+     we are plotting).
+     
+```{r}
+set.seed(123)
+km3 <- kmeans(lecture23, centers = 3, nstart = 10)
+
+plot(lecture23$x2, lecture23$x5,
+     col = km3$cluster, pch = 19,
+     xlab = "x2", ylab = "x5",
+     main = "x2 vs x5 colored by k=3 clusters")
+legend("topright", legend = 1:3, col = 1:3, pch = 19)
+
+pairwise_dist <- dist(lecture23)
+mds_2d <- cmdscale(pairwise_dist, k = 2)
+plot(mds_2d,
+     col = km3$cluster, pch = 19,
+     xlab = "MDS Dim 1", ylab = "MDS Dim 2",
+     main = "MDS plot colored by k=3 clusters")
+legend("topright", legend = 1:3, col = 1:3, pch = 19)
+```
+
+I think the clusters look reasonable. The points are all grouped together in the clusters, and the clusters are not overlapping too much.
+
+7. Apply hierarchical clustering to the pairwise distance data.
+
+   - Use `hclust` to cluster the `pairwise_dist` matrix, producing a model which
+     we'll call `hclust_model`.
+   - Plot the model to obtain the dendrogram. 
+   - How many clusters do you think there are based on this dendrogram? A good
+     splitting point of the dendrogram is a place where there is a large
+     vertical separation between joined clusters.
+   - For your chosen number of clusters, extract the clustering membership
+     labels (one for each observation) from the hierarchical clustering model.
+     You may find `cutree` useful here.
+   - Plot the multidimensional scaling data and color the observations 
+     with its cluster membership you just extracted.
+     
+```{r}
+hclust_model <- hclust(pairwise_dist, method = "complete")
+plot(hclust_model,
+     main = "Dendrogram of lecture23",
+     xlab = "", sub = "")
+
+hc_clusters <- cutree(hclust_model, k = 3)
+
+plot(mds_2d,
+     col = hc_clusters, pch = 19,
+     xlab = "MDS Dim 1", ylab = "MDS Dim 2",
+     main = "MDS plot colored by hierarchical clusters")
+legend("topright", legend = 1:3, col = 1:3, pch = 19)
+```
+
+I see 3 clusters in the dendrogram, and I think the clusters look reasonable. The points are all grouped together in the clusters, and the clusters are not overlapping too much.
+
+8. **Extra Credit** Let's look at the `pairwise_dist` distance matrix.
+
+   - Create an image of the `pairwise_dist` matrix we created in question 3. You
+     may find `as.matrix` useful here.
+   - The hierarchical clustering model (`hclust_model`) we created in question 6
+     has an `$order` field, which is the order of the observations along the
+     bottom of the dendrogram.  Use this order to:
+
+        - Reorder the `lecture23` observations according to the order found by
+          `hclust`.
+        - Create a pairwise distance matrix of the reordered observations.
+        - Create an image of this reordered distance matrix.
+
+     Does this second matrix appear to have more or less of a pattern than the
+     first matrix?  Do either of the matrices appear to show you clustering
+     information?
+     
+```{r}
+dist_mat <- as.matrix(pairwise_dist)
+image(dist_mat,
+      main = "Original Pairwise Distance Matrix",
+      xlab = "Obs", ylab = "Obs")
+```
+
+```{r}
+ord <- hclust_model$order
+dist_reord <- dist_mat[ord, ord]
+image(dist_reord,
+      main = "Reordered Distance Matrix",
+      xlab = "Obs (hclust order)",
+      ylab = "Obs (hclust order)")
+```
+
+The first matrix appears to have more of a pattern than the second matrix. The first matrix has more of a block pattern, while the second matrix is more random. The first matrix shows some clustering information, while the second matrix does not.

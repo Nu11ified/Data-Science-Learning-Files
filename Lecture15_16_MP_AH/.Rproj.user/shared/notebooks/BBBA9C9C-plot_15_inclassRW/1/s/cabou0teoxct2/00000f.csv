@@ -1,0 +1,9 @@
+"0","library(tidyverse)"
+"0","covid %>% "
+"0","  select(-ObjectId) %>% "
+"0","  rename(sars_rna_copies = SARS_CoV_2_copies_L,"
+"0","        new_covid_cases = Number_of_New_COVID19_Cases_by_) %>%"
+"0","  filter(is.na(sars_rna_copies)==FALSE & new_covid_cases>=5)  -> covid_df"
+"2","Error in rename(., sars_rna_copies = SARS_CoV_2_copies_L, new_covid_cases = Number_of_New_COVID19_Cases_by_) : 
+  could not find function ""rename""
+"

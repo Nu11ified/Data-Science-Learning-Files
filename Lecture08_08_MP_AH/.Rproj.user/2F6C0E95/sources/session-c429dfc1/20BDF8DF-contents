@@ -1,0 +1,106 @@
+---
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65),
+  tidy=TRUE
+)
+```
+
+
+CSI 2300: Intro to Data Science
+
+In-Class Exercise 08:  Exploratory Data Analysis
+
+
+1.  The Texas Water Development Board (TWDB) is a Texas state agency that provides a variety of water data resources. In particular, its Water Science and Conservation group maintains Water Data for Texas, which provides data on water reservoirs across Texas. This problem involves their reservoir dataset.  We will need to read in this data directly to RStudio from "https://www.waterdatafortexas.org/reservoirs/statewide.csv". There are 29 rows of non-data related header at the top of the file. Make sure to disregard this when inputing the data. Show the code needed to accomplish this.
+
+```{r}
+www <-"https://www.waterdatafortexas.org/reservoirs/statewide.csv"
+water <- read.csv(www, header = TRUE, skip = 29)
+```
+
+2.  How many observations are there in the dataset? How many variables are there, and what are their default names? Please include the R commands used (if any) to find out this information. If no specific commands were used, then note that.
+
+```{r}
+nrow(water)
+ncol(water)
+dim(water)
+
+colnames(water)
+```
+
+3. The `percent_full` variable is the ratio of conservation storage to conservation capacity expressed as a percentage.   Visualize  how full Texas  reservoirs have been since the data began to be recorded. In other words, plot the percent full over time. What are your observations about this data?
+
+```{r}
+library(lubridate)
+water$date <- date(water$date)
+plot(water$date, water$percent_full)
+```
+
+
+
+
+Over the following four questions, we will be incrementally creating a plot of the yearly percent full from 2016 - 2020, overlaying each new year on top of the others. 
+
+4. First, filter the data to just contain the specified years. 
+
+
+
+5. Run the following command:
+
+```{r eval=FALSE}
+#plot(1:365, seq(50, 100, len=365), type = "n", xlab = "", ylab = "")
+```
+
+This will create a blank plot where the year in days is on the x-axis, and the y-axis will contain the range of percentages that should be present in the data.   
+
+6. Now, using the `line()` command, overlay the percent full for each of the years (2016 - 2020) with each year being a different line and different color. *Note: `for` loops could be useful here but are not required because we have not covered these in class yet. 
+
+
+
+7. Now this data can be difficult to understand without some form of label information. Add label information and a legend to this plot in order to help the reader understand what is being displayed. 
+
+```{r}
+
+#legend("bottomleft", c("2016", "2017", "2018", "2019", "2020"), lty = c(1, 1, 1, 1, 1), col = c(5, 4, 3, 2, 1), bty = "n")
+#title("Texas Reservoirs Percent Full (2016 - 2020)", xlab = "Days of the Year", ylab = "Percent Full (%)", cex.main = 1.5, cex.lab = 1.25)
+
+```
+
+8. One of the ways you can help identify patterns in time series data is to create a "smoother," such as the lowess smoother. The lowess smoother will fit a line to noisy, sparse, or weak data to improve your ability to see patterns. The following code will create a plot and add a few lines to represent various smoothers:
+
+```{r, eval = FALSE}
+
+water20 <- water[water$date > "1980-01-01", ]
+date20 <- date(water20$date)
+
+plot(date20, water20$percent_full, type="l", xlab = "Year", ylab = "Percent Full (%)")
+smooth1 <- lowess(water20$percent_full, f=0.1)
+lines(date20, smooth1$y , lwd=2, col=4)
+
+smooth2 <- lowess(water20$percent_full, f=0.5)
+lines(date20, smooth2$y , lwd=2, col=2)
+
+smooth3 <- lowess(water20$percent_full, f=0.05)
+lines(date20, smooth3$y , lwd=2, col="green")
+
+legend("bottomleft", c("f=0.1", "f=0.5", "f=0.05"), lty = c(1, 1, 1), col = c(4, 2, "green"), lwd = c(2,2,2), bty = "n")
+
+```
+
+Given this visualization, do learn anything about the most recent 20 years of observations? What effect does increasing the `f` argument in the `lowess` call have?  Which value of `f` would you choose to use to display the data?
+
+

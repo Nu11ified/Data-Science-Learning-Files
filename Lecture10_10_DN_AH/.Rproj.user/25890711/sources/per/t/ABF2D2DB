@@ -1,0 +1,27 @@
+{
+    "id": "ABF2D2DB",
+    "path": "~/Downloads/Lecture10_10_DN_AH/prog_10_inclass.Rmd",
+    "project_path": "prog_10_inclass.Rmd",
+    "type": "r_markdown",
+    "hash": "425219284",
+    "contents": "",
+    "dirty": false,
+    "created": 1740543882490.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "chunk_output_type": "console",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "134,103",
+        "scrollLine": "120"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1740546043,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1740546043544,
+    "read_only": false,
+    "read_only_alternatives": []
+}

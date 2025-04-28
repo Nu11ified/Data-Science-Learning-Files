@@ -1,0 +1,6 @@
+"0",""
+"0","# Convert date to Date format"
+"0","water$date <- as.Date(water$date)"
+"0",""
+"0","# Plot percent_full over time"
+"0","plot(water$date, water$percent_full, type = ""l"", xlab = ""Date"", ylab = ""Percent Full (%)"", main = ""Texas Reservoirs Percent Full Over Time"")"

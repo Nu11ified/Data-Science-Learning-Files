@@ -1,0 +1,56 @@
+---
+title: "Reordering boxplots"
+author: "Doug Nychka"
+date: "1/27/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First create a data frame with several categories as factors. 
+
+```{r}
+Z<- c(1:20, 31:40, 101:110)
+tag<- rep( c("D","A","C","B"), rep(10,4))
+df<- data.frame( Z=Z,tag= factor(tag))
+head( df)
+```
+Here a boxplot of data grouped by the factor. This is the default order based on sorting the names (A through D)
+
+```{r}
+boxplot( Z~ tag, data = df)
+```
+Now reorder in reverse order ( D throug A)
+
+```{r}
+boxplot( Z~ tag, data = df, at=4:1)
+```
+
+How about ordering by the size of the mean? Here we need to get the ranks of the groups based on the mean value.
+
+```{r}
+groupMeans<- tapply( Z, tag, mean, data=df)
+index<- rank( groupMeans)
+boxplot( Z~ tag, data = df, at=index)
+```
+
+Sometimes in ordering by a numeric value it is useful to just locate the boxplots by those values. Here we just plot the boxplots at there mean values.
+This saves a step in ranking and creates a different horizontal axis and so the box width needs to be adjusted to the x axis limits.
+I added the axis on top to avoid collision with the group labels and increased the range based on the data to accommodate the first box. 
+
+
+
+```{r}
+groupMeans<- tapply( Z, tag, mean, data=df)
+boxplot( Z~ tag, data = df, 
+         at=groupMeans,
+         boxwex=8, xlim=range(df$Z) )
+axis(3) 
+```
+
+
+
+
+

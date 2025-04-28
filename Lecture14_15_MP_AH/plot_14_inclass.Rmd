@@ -1,0 +1,38 @@
+---
+title: "Lecture 14: Data Visualization In-Class Exercise"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Manas Reddy
+
+Today, you will be broken up into groups and assigned an image to examine. In your group, address the following questions based on the information within the infographic:
+
+* What is the overall intent of the graphic?
+
+To demonstrate the amount of water and energy the utilization of AI.
+
+* Who is the intended audience (if any)?
+
+The general public as it intends to inform those who casually use AI everyday and may be aware of its existence but not its impact.
+
+* Did the authors achieve their goal(s)? 
+
+Yes, the authors achieved their goal of informing the general public of the impact of AI on water and energy consumption.
+
+* What are the strengths and weaknesses of the graphic?
+
+Strengths: The graphic is visually appealing and easy to understand. The graphic is also informative and provides a lot of information in a concise manner.
+
+Weaknesses: The graphic does not provide a lot of context for the data presented. The graphic also does not provide a lot of information on the sources of the data presented.
+
+* How could this graphic be improved, if at all? 
+
+The graphic could be improved by providing more context for the data presented. The graphic could also be improved by providing more information on the sources of the data presented.
+
+At the end of the group work time, we will reconvene, and each group will be provided 3-5 minutes to present their graphics and their answers to these questions. 
+
+Submission: Your group is required to submit a complete write up of the answers to these questions as well as any additional discussion held when the class came back together. Have one group member submit this write up (WITH ALL GROUP MEMBER NAMES AT THE TOP) through Canvas. 

@@ -1,0 +1,142 @@
+---
+output: "pdf_document"
+editor_options: 
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65)
+)
+```
+
+#  CSI 2300: Intro to Data Science
+
+## In-Class Exercise 10: Some tools for data wrangling.
+
+1. In the Eagle Mountain data the **rep** function was used to repeat
+the dates several times. This function very flexible. Explain the difference between the examples:
+
+``` {r}
+rep(1:10, 5) #repeats the numbers 1-10 5 times
+rep(1:10, rep(5, 10)) #repeats the numbers 1-10 5 times
+rep(1:10, each = 5) #repeats the numbers 1-10 5 times
+rep(1:10, 1:10) #varies the number of times we'd repeat the numbers 
+
+#TODO comment on what each line is doing
+```
+
+
+2.  Suppose that **A** is a matrix, for example 
+
+```{r} 
+A <- matrix(1:48, nrow = 6, ncol = 8) #syntax for a matrix
+```
+
+The R command 
+
+```{r}
+b <- c(A) #vector
+#it stacks the columns
+```
+
+will convert this matrix into a vector. Does it do it by stacking rows or columns?
+What R code can you use to convert **b** back into **A**?
+
+```{r}
+A <- matrix(b, 6, 8)
+```
+
+
+What happens if you apply the `c()` command to a dataframe?
+
+```{r}
+A_df <- as.data.frame(A)
+b2 <- c(A_df)#This is a list as opposed to a vector
+
+#NOTES: access pieces in a list 
+b2[1]#this is the info in column 1 
+b2[6]
+```
+
+
+
+
+3. Another way of formatting the Eagle Mountain Lake data is to order the observations with all the times for the first depth, then the second depth, and so forth. Create the correct depth and date columns for this type of ordering and include the temperature variable to create a 3 column data frame  (the `rep()` and `seq()` functions may be useful here).  To format the data this way, do you need to convert the original **temp** data frame to a matrix?
+
+```{r}
+temp <- read.csv('dat/EagleMountain/temp_through_09_12_2019.csv')
+N <- nrow(temp)
+#from the WIDE form
+#vector the dates
+date <- temp$DateTime
+#vector with the depths
+depth <- seq(0, 10, by = 0.5)
+M <- length(depth)
+#vector that's a smushed matrix of the temps
+
+
+#to the LONG form 
+#big depths
+bigDepths <- rep(depth, each = N)
+#big dates
+bigDates <- rep(date, M)
+#vector that's a smushed matrix of the temps
+bigTemp <- c(as.matrix(temp[,3:23]))
+new.df <- data.frame(DateTime = bigDates, 
+                     depth = bigDepths, 
+                     temp = bigTemp)
+
+
+```
+
+
+4. Read  in the wrangled and formatted data from the binary file
+`EML_through_09_12_2019.rda`  using the load function.  The .rda ending  indicates this format. The first column are the dates, but are they date objects? Show how you can tell.
+
+```{r}
+library(lubridate)
+load('dat/EML_through_09_12_2019.rda')
+#day(all.data$DateTime)#this throws an error, bc col is a character 
+
+all.data$DateTime <- mdy_hm(all.data$DateTime)
+#day(all.data$DateTime)
+
+```
+
+
+5. Here is a nice way to visualize data that has two dimensions, in this case time (about the first two years) and depth. 
+
+```{r}
+library(fields)
+temp  <-read.csv(
+  file = "dat/EagleMountain/temp_through_09_12_2019.csv", header=T)
+
+tempImage <- as.matrix(temp[ ,(1:21)+ 2])
+depth <- seq(0, 10, by=0.5)
+time <- 1:nrow(tempImage)
+image.plot(time, depth, tempImage)
+
+```
+
+How must the arguments to `image.plot()` be organized?
+
+**vector with time data and depth data (not replicated),third argument takes the matrix of temperature data.**
+
+Do you see any outliers or unusual time periods in these data to investigate? Is there any evidence of seasonality in these water temperatures?
+
+**There is a seasonality trend where red after 500 looks like hotter than usual weather.**
+
+water is cooler in April, warmer in the sumer months, 
+the water gets cooler as yo go deeper, 
+yellow streak at ~ 500 looks like an outlier
+

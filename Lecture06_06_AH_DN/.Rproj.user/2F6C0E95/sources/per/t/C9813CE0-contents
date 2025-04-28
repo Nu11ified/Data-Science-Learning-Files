@@ -1,0 +1,106 @@
+---
+output: "pdf_document"
+editor_options: 
+  chunk_output_type: console
+urlcolor: blue
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=80),
+  tidy=TRUE
+)
+```
+
+CSI 2300: Intro to Data Science
+
+In-Class Exercise 06:  Exploratory Data Analysis
+
+
+These are the packages that we'll need for today's exercises:
+
+The data for today comes from the mowater package. You can install it by running the code below. You only want this chunk to run once, so after you have the package, set eval back to FALSE.
+
+```{r, eval = FALSE}
+#install.packages("devtools")
+library(devtools)
+devtools::install_github("rachwhatsit/mowater_pkg", subdir = "mowateR") 
+
+```
+
+
+```{r load-packages, echo=TRUE, results="hide", message=FALSE}
+library(lubridate)
+#library(mowateR)
+```
+
+
+
+The data for today's exercises come from the Boulder Water Resource and Recovery Facility.
+
+First is a picture of the facility where the data are collected.  It shows three aeration basins together, and the next plot shows a diagram of the flow of water through one aeration basin.  The red highlighted basins are ``aerated," meaning that oxygen is being pumped by blowers into the sludge, and the other basins are not aerated.  One goal with this data is to try to predict ammonia in Zone 7. 
+
+```{r the-data, include=TRUE}
+load(file="dat/boulder_ammonia.rda")
+```
+
+![](fig/bwrrf.png){width=50%}
+![](fig/aeration_basin.png){width=25%}
+![](fig/legend.png){width=30%}
+
+
+1. Look at the names of the  variables in the data file.  Using just the names, can you figure out what each of the variables is?  What is the naming convention used?
+
+```{r}
+class(boulder_ammonia)
+colnames(boulder_ammonia)
+head(boulder_ammonia)
+dim(boulder_ammonia)
+#AB stands for aeration basin
+#Z stands for zone
+#DO stands for dissolved oxygen
+#finally, the unit of measurement
+
+```
+
+
+2. Describe the type of each of the variables.
+```{r}
+#everything is quantitative and continuous EXCEPT date time
+```
+
+
+3. How frequently are the measurements taken?
+
+
+4. What are the first and last dates in the dataset?
+
+
+5. Compute the mean, median, and standard deviation of the ammonia data. To identify observations that are unusual, people commonly compute the number of standard deviations away from the mean that an observation is.  Find the minimum and maximum values of ammonias, and compute the number of standard deviations these values are away from the mean.
+
+
+6. Compute the 1, 5, 10, and 90, 95, 99^th^ quantiles of ammonia.
+
+
+7.  The way to obtain the hour associated with each observation is given below. Note that the hours are labeled as {0,1,2,...23}. Find the mean value of ammonia for each hour of the day.  The command `tapply()` could be useful here.  Do there appear to be differences in ammonia across the course of a day?  If so, why do you think that this could be occurring?
+
+
+8. Compute the mean and standard deviation of the dissolved oxygen (DO) as you move from Zone 6 to Zone 9.  How does DO change as you move through the basin?
+
+
+9.  Both the mean and the median measure the center of a dataset. However, there can be differences between them. If a distribution is symmetric around its center, the mean and the median will be about the same. If the distribution is not symmetric, the mean will be drawn to the more extreme values.  Compare the mean and median of nitrate in both Zone 3 versus Zone 9. In which zone does the distribution of nitrate appear to be symmetric, based only on comparing their mean and median?
+
+
+10.  How often is  ammonia  above 8 mg/L in this dataset?
+
+
+
+
+
+
+

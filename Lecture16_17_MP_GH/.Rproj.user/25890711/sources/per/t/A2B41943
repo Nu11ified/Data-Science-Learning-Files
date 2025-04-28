@@ -1,0 +1,26 @@
+{
+    "id": "A2B41943",
+    "path": "~/Downloads/Lecture16_17_MP_GH/ShinyTemplate.R",
+    "project_path": "ShinyTemplate.R",
+    "type": "r_source",
+    "hash": "1128166999",
+    "contents": "",
+    "dirty": false,
+    "created": 1742999188512.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "58,8",
+        "scrollLine": "39"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1743000782,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1743000782,
+    "read_only": false,
+    "read_only_alternatives": []
+}

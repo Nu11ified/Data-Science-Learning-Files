@@ -1,0 +1,4 @@
+"0",""
+"0","# Add lowess smoothers with different f values"
+"0","smooth1 <- lowess(water20$percent_full, f = 0.1)"
+"0","lines(date20, smooth1$y, lwd = 2, col = 4)  # col = 4 is blue"

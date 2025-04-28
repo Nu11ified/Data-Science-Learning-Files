@@ -1,0 +1,8 @@
+"0",""
+"0",""
+"0","for (i in 2016:2020){"
+"0","  temp_df <- water[year(water2020$date) == i, ]"
+"0","  lines(1:nrow(temp_df), temp_df$percent_full, col=i-2015)"
+"0","}"
+"2","Error in year(water2020$date) : could not find function ""year""
+"

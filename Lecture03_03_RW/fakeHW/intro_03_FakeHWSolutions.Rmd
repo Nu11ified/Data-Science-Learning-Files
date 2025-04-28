@@ -1,0 +1,97 @@
+---
+title: "Lecture04FakeHWSolutions"
+author: "Doug Nychka"
+date: "1/17/2021"
+output: pdf_document
+---
+
+```{r include=FALSE}
+# include = FALSE means no output 
+# this makes for a cleaner solution.
+knitr::opts_chunk$set(echo = TRUE)
+library( fields) # also load the fields library
+```
+<!-- BEGIN Comment
+A copy of the problem for reference but not printed out
+## Problem 1
+Create the RNATest data set and ...
+* (A) What are the median and  mean for these RNA data? 
+  Which is larger?
+* (B) Plot a histogram of these data and locate the mean and median by vertical lines. (You can use the fields package function ```xline``` to to add the lines.)
+* (C) Do any of the values  seem to  be outliers, i.e. unusual, worthy of scrutiny?
+END Comment   -->
+
+# Problem 1 
+
+## Solution to (A)
+
+```{r echo=FALSE}
+# echo here means do not show these commands
+# they were given in the problem
+covid <-
+  read.csv(file = "CDPHE_COVID19_Wastewater_Dashboard_Data.csv", header = T)
+boulder_covid <- covid[covid$Utility == "Boulder", ]
+
+RNATest<- na.omit( boulder_covid$SARS_CoV_2_copies_L )
+```
+
+Having created the subset of data ( ```RNATest```)  following the homework
+instructions. 
+Here are the mean and median. 
+
+```{r}
+mean( RNATest)
+median(RNATest)
+```
+
+We see that the mean is larger. 
+
+## Solution to (B)
+
+<!--  Play around with the figure size so it 
+      looks nice ... 
+-->
+
+```{r fig.height=6, fig.width = 6 }
+hist( RNATest, nclass=10, 
+        xlab="SARS/COVID copies", main="")
+# don't make a title here 
+fields:::xline(  mean(  RNATest), col="blue",    lwd=4)
+fields:::xline(  median(RNATest), col="magenta", lwd=4)
+title("Boulder utility WW measurements \
+ median (magenta)  mean (blue)")
+```
+
+<!-- Insert a page break so next answer is on a new page.
+This is a command in the markdown language 
+-->
+
+\pagebreak
+
+## Solution to (C)
+
+```{r}
+max( RNATest)
+```
+
+Based on the shape of this histogram I see many values clustered below about
+*125,000* and some larger values beyond that. However, the maximum value,
+( $\approx 281,000$ )   
+  seems to be much larger relative to  the others and should be examined more closely. 
+
+<!--  
+The $ symbols calls/trigger LaTex to evaluate what is inside
+Of course one needs to know that the  approximate symbo in
+Latex is specified by \approx .
+In general  use  $ to enclose any LaTeX formula or math 
+expression to see it in R Markdown. 
+ -->
+
+
+
+
+
+
+
+
+

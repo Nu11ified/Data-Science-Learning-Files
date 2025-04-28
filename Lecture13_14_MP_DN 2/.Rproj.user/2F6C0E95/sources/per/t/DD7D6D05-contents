@@ -1,0 +1,70 @@
+---
+title: "In Class Exercises: Lecture 13"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. For this in class exercise we will be using the boulder_ammonia data. Show the R commands to load this data. You may use the `.rda` version from a previous lecture if needed.
+
+
+
+2. Was the ammonia level at the end of the day on January 1, 2019 higher than the beginning or vice versa? Write an `if()` statement that prints "Ammonia was higher at the beginning of the day" if it is, and otherwise prints "Ammonia was higher at the end of the day." if it isn't.
+
+
+
+3. Create an if statement that will check what quantile (first, second, third, or fourth) the last ammonia measurement for January 1st falls into. Then, have it print to the screen which quantile the measurement is in, such as "Ammonia level is within the first quantile."
+
+
+4. As we have discussed in class, filtering of the data is one of the many activities we will be called upon to perform when working with data. One way that we can accomplish this would be to use loops and conditionals to pull out the data that we find relevant and store it in a new data frame. In order to accomplish this, we would use the 'rbind()' command to add rows that fit our parameters to a new data frame. 
+
+```{r eval=FALSE}
+rbind(<old existing object>, <new object to be added>)
+```
+
+To accomplish this we must create a new data frame with the same number of variables/columns and use the rbind() command to add a new observation. For this question, you are to create a new data frame that contains all of the observations starting at the beginning and ending when the ammonia level exceeds 12. Fill in the following code chunk to perform this operation. How many observations are in this dataset?
+
+```{r eval=FALSE}
+
+low_ammonia <- boulder_ammonia[1, ]
+
+i <- 
+while() {
+  low_ammonia <- rbind(,)
+  i <- i + 1
+}
+
+nrow(low_ammonia)
+
+```
+
+5. Loops are  useful in and of themselves, and they can be combined to work with intricate data. As a thought exercise, create a 6x4 matrix of  integer values, as shown below. 
+
+```{r}
+# Create a matrix
+mat <- matrix(1:24, nrow = 6, ncol = 4)
+```
+
+Then create a *for loop* that will cycle through the values and print out the value of each cell in the following format:
+
+```{r echo=FALSE}
+print("Row 1 and column 1 has a value of 10")
+```
+
+To print to the console a combination of variables and string literals, use the 'paste()' command in conjunction with 'print()'. Here is an example of the syntax. 
+
+```{r eval=FALSE}
+print(paste("Hello, my name is", name)
+```
+
+
+
+6. Now write a `for` loop that sums up the values for each of  the rows, and prints the total for each row, as follows:
+```{r echo=FALSE}
+print("Row 1's total value is 40.")
+```
+
+Additionally, count the number of even and odd row totals, and output the results after the loop. 
+

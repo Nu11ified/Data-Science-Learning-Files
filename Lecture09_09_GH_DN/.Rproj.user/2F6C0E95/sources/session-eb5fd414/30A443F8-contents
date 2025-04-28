@@ -1,0 +1,203 @@
+---
+output: "pdf_document"
+editor_options: 
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65)
+)
+```
+
+# CSI 2300: Intro to Data Science
+
+## In-Class Exercise 09: Exploratory Data Analysis 
+
+The data for today's exercises come from the `mowater` library, the `eml`
+dataset. This data are about measurements of the properties of water in the Eagle
+Mountain Lake reservoir in North Texas.
+
+1. Load the `mowater` library, and then load the `eml` dataset. In the RMarkdown
+   document, show the commands you use to do this, but not the
+   output of those commands (`message=FALSE` as an option in the code chunk
+   header is a good way to do this).
+
+```{r message=FALSE, eval=TRUE}
+library(devtools)
+devtools::install_github("rachwhatsit/mowater_pkg", subdir = "mowateR")
+#library(mowateR)
+#data(eml) 
+
+load("dat/eml.rda")
+head(eml)
+```
+
+
+2. Next, inspect the dataset.
+
+
+```{r}
+#dim(eml)
+nrow(eml)#number of rows, observations
+ncol(eml)#number of columns, variable
+
+```
+
+
+   - How many variables are there?
+   
+   - How many observations are there?
+   - Are the data already sorted in time order?
+
+```{r}
+sum(sort(eml$Date.Time) == eml$Date.Time)#yes, they are in time order
+```
+   
+   - What do the variables represent, do you think? You may want to consult the
+     `help` for the dataset to understand it better, including the units of
+     measurement. 
+     
+Date time is date and two-hour time period, Depth is profile measured in meters TODO: copy over for the variable type
+   - What are the ranges of the values? 
+```{r}
+#summary(eml) #one way 
+#range(eml$Depth) #another way, if repeated for eachcol
+apply(eml,2, range)
+```
+   
+   - Are there any missing values (NA values)? 
+   
+```{r}
+sum(is.na(eml))#no missing values
+```
+
+
+
+3. The size of our dataset is rather large for easy (and fast) manipulation. 
+   Pare it down by creating a new data frame with only the last $500$ observations in it. This is
+   throwing away a lot of information, and we should be careful any time we do
+   this. But if we try to use all the data, it may be too time-consuming for an
+   in-class exercise.
+   
+```{r}
+eml_small <- tail(eml, 500)
+```
+
+
+
+
+4. Now that the data are of a manageable size for visualizing it, plot all of
+   the variables against each other. Try calling `plot(eml_small)`,  but replace
+   `eml_small` with the name of the *small* data frame you just created.  This creates a matrix of pairwise scatterplots.  
+   (If this takes a very long time, you may have made the mistake of trying to
+   plot the original dataset, which is quite large for this task.)
+   
+```{r}
+plot(eml_small)
+```
+
+
+
+5. Look at the plot and consider which pairs of variables appear to be linearly
+   related. Choose `DO` and `pH`.  Make a scatter plot of `DO` on the
+   y-axis and `pH` on the x-axis.  Which one are you thinking of as the
+   independent variable, and which one are you thinking of as the dependent
+   variable?
+
+TODO: list linear relationship
+
+```{r}
+plot(eml_small$pH, eml_small$DO)
+```
+ 
+TODO: tell me which is the dependent and independent variable
+
+
+
+6. Run a linear regression by calling `lm(DO ~ pH, data=eml_small)`
+   where again `eml_small` is the small data frame.  Plot the regression line on
+   the scatter plot using `abline` on the model that `lm` returns. If the line
+   doesn't appear to follow the data, you may have switched the variables (for
+   the plot versus the linear regression).
+
+```{r}
+m <- lm(DO ~ pH, data=eml_small)
+#abline(a = m$coefficients[1], b = m$coefficients[2], col = 'red')
+abline(m, col = 'pink')
+
+```
+
+
+7. Investigate the coefficients and summary statistics of the model that `lm`
+   gave you. Comment on the coefficient values, significance levels of the
+   coefficients (are they significantly different from $0$), and $R^2$ values.
+   Does there appear to be a linear relationship between these two variables?
+
+```{r}
+coef(m)
+#sign and magnitude of each coef in terms of the values modeled, e.g.
+#as pH increases by one standard pH unit, DO increases by about 13 mg/L
+#intercept is -98, if we imagine pH = 0, then DO = -98 mg/L
+summary(m)
+hist(m$residuals)
+# both coefficients are highly statistically significant at the 0.0001 level
+#99.99% confident that our coefficients are non-zero
+#multiple R^2 value is 0.7135 and #adjusted is 71.3 
+#71.3% of the variance in the data is explained by the model
+```
+
+
+8. Use the model to make a prediction of the dependent variable for when the
+   variable `pH` is $7.7$. You can do this by direct computation if you want
+   (rather than using any specialty R command).  Hand-check your work on your
+   plot. Is the predicted value close to the plotted data?
+   
+```{r}
+y_pred <- coef(m)[2]*7.7 + coef(m)[1]
+plot(eml_small$pH, eml_small$DO)
+abline(m, col = 'pink')
+abline(v = 7.7, col = 'green')
+abline(h = y_pred, col = 'green')
+#the predicted value is reasonably close, but it's underpredicting
+```
+  
+
+
+9. Do you trust this model to make a prediction of `DO` for a `pH` value of 3?
+   Explain your answer.
+```{r}
+#the range of the independent variables is from 7.4 - 7.9, 
+#a pH of 3 is well outside the range of our model
+```
+   
+
+
+10. Extra credit: repeat steps 5-7, but for a different pair of variables than
+   the pair you were just working with. Compare the models; does it appear
+   that one pair of variables is more strongly linearly related than the other
+   pair? Note, do not choose the pair `DO` and `DOsat` as they are the same
+   variable but measured in different units.
+   
+```{r}
+m2 <- lm(DO ~ Temp, data = eml_small)
+plot(eml_small$Temp, eml_small$DO, col = 'purple')
+abline(m2, col = 'yellow')
+summary(m2)
+
+DO_pred = coef(m2)[2]*28.2 + coef(m2)[1]
+abline(h = DO_pred, col = 'red')
+abline(v = 28.2, col = 'red')
+```
+
+
+

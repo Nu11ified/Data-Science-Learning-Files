@@ -1,0 +1,4 @@
+"0",""
+"0","# use lm() to find a linear model"
+"0","model <- lm(DO ~ pH, data=eml_small)"
+"0","abline(model, col=""red"")"

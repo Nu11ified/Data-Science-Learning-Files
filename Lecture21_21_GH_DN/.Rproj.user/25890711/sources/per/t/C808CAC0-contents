@@ -1,0 +1,263 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+editor_options: 
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65)
+)
+```
+
+```{r echo=F}
+# the cross-validation code inside cv.glmnet() uses randomness, so to get
+# reproducible results, we set the seed here.
+set.seed(1)
+```
+
+# CSI 2300: Intro to Data Science
+
+## In-Class Exercise 21: Modeling -- Variable Selection
+
+For this lecture, we'll return to another dataset we've used before; the Boulder
+Housing dataset^[https://www.bouldercounty.org/property-and-land/assessor/sales/recent/].
+
+1. Load the 2020 Boulder housing dataset in
+   (`boulder-2020-residential_sales.csv`), and let the following code do some
+   data wrangling for you. Then answer the following questions:
+
+    - Which variables are removed?
+    - Which variables are kept?
+    - Why should we remove variables that have a constant value?'
+    
+We drop the two ID‑like columns, the sale date, every text/character field, and any column that never varies (min = max). Everything left is numeric and nonconstant. A column with zero variance carries no information and can even cause numerical problems in regression.
+
+```{r}
+sales2020 <- read.csv(file="boulder-2020-residential_sales.csv", 
+                      header=T, stringsAsFactors=F)
+
+# may be useful later
+sales2020_orig_vars <- colnames(sales2020)
+
+# Remove $ and , (dollar signs and commas) from every price, then parse as
+# integer. In the pattern, the vertical bar "|" means "or".
+to_remove_pattern <- '\\$|,'
+for (v in c("BLDG_VALUE", "LAND_VALUE", "EXTRA_FEATURE_VALUE", "SALE_PRICE")) {
+    digits_only <- gsub(to_remove_pattern, '', sales2020[,v])
+    sales2020[,v] <- as.integer(digits_only)
+}
+
+# turn the MULTIPLE_BLDGS from a character into an integer (with value 0 or 1)
+sales2020$MULTIPLE_BLDGS <- as.integer(sales2020$MULTIPLE_BLDGS == "YES")
+
+# Remove several variables from our data frame:
+#   - RECEPTION_NO and Market.Area.1 are numeric, but they are IDs which are
+#     more like categories than numbers, and shouldn't be used for regression
+id_variables <- colnames(sales2020) == "RECEPTION_NO" | colnames(sales2020) == "Market.Area.1"
+#   - variables which are of type character
+chr_variables <- sapply(sales2020, is.character)
+#   - variables that are constant (always the same value)
+constant_variables <- NULL
+for (i in 1:ncol(sales2020)) {
+    constant_variables[i] <- (min(sales2020[,i]) == max(sales2020[,i]))
+}
+# other variables that should be excluded because they are too linked to the
+# dependent variable SALE_PRICE. (We can't know the SALE_DATE in advance, when
+# we put the house on the market for sale.)
+other_variables <- colnames(sales2020) == "SALE_DATE"
+
+# remove all of the above variables
+to_remove = which(id_variables | chr_variables | constant_variables | other_variables)
+sales2020 <- sales2020[,-to_remove]
+
+head(sales2020)
+```
+
+
+
+2. Build a multiple linear regression model to predict the `SALE_PRICE`
+   (dependent variable) using *all* of the available independent variables.
+   Remember to use the `data=sales2020` option so that you can name the
+   variables (e.g.) `SALE_PRICE` and not `sales2020$SALE_PRICE`.
+   
+```{r}
+lm_full <- lm(SALE_PRICE ~ ., data = sales2020)
+summary(lm_full)
+```
+
+
+    - Discuss the signs, values, and significance of the estimated coefficients.
+    - Do the coefficient values make sense? Why or why not?
+    
+Overall the full‐model coefficients behave just as you’d expect living‐area, bath counts, newer year‐built and the assessed land values all come in positive and highly significant, and their dollar‐per‐unit magnitudes are right in line with Boulder market norms. Meanwhile unfinished basement or “other buildings” aren’t significant once the main features are in.
+
+3. Use backward stepwise elimination to select a model with (hopefully) fewer
+   coefficients than the full model we just tried.  Here are a few tips:
+
+   - Remember to use `k=log(n)` (where `n` is the number of observations) to use
+     the BIC (which gives a heavier penalty to complex models than the default
+     AIC). 
+   - The `step()` method prints a *lot* of information. You may want to view all
+     of it the first time it runs to see what is going on. But in your
+     assignment you may want to limit its output by giving it the argument
+     `trace=0`. 
+     
+```{r}
+n <- nrow(sales2020)
+lm_back <- step(
+  lm_full,
+  k     = log(n),
+  trace = 0
+)
+summary(lm_back)
+```
+
+     
+   Then answer these questions:
+
+    - Which variables are kept? Which variables are eliminated?
+    - Do the variables that were kept seem relevant? Do the variables that were
+      eliminated seem like good candidates for elimination?
+    - How is the resulting model better than the full model we started with? How
+      is it worse?
+
+Backward stepwise (BIC) trims out the nonsignificant bits and hangs on to land/value, size, baths, year built, garage, etc. The keepers all make sense—those are the real drivers of price—and dropping the noise gives a leaner model that barely loses any fit but gains in simplicity.
+
+
+4. Use forward stepwise selection to select a model with (hopefully) fewer
+   variables.
+
+   - Remember to use `k=log(n)` again for the BIC.
+   - Use the `scope=` parameter to give the `step()` function the set of
+     variables of the full model.
+     
+```{r}
+lm_null <- lm(SALE_PRICE ~ 1, data = sales2020)
+lm_forw <- step(
+  lm_null,
+  scope   = list(lower = lm_null, upper = lm_full),
+  direction = "forward",
+  k       = log(n),
+  trace   = 0
+)
+summary(lm_forw)
+```
+
+
+   Then analyze the model you get back. How does it compare to the model chosen
+   by backward elimination?
+   
+
+
+Forward selection ends up with essentially the same core set as backward—year built, sqft, main bath counts, land/building value, garage—sometimes swapping in multiple bldgs or one extra basement term. It’s just as sensible and almost identical in R2/BIC; you end with the same story whether you add variables or peel them away.
+
+
+5. Use LASSO regression with `cv.glmnet` to find a model based on penalized
+   regression. There is one data preparation step you'll have to do first:
+   
+   - Create a *matrix* for the independent variables (using the original data
+     frame).  Since `SALE_PRICE` is the dependent variable, it should also be
+     excluded from the matrix. We use a matrix since the `glmnet` methods don't
+     work on the `data.frame` type.
+     
+```{r}
+library(glmnet)
+
+X <- model.matrix(SALE_PRICE ~ ., sales2020)[, -1]
+y <- sales2020$SALE_PRICE
+
+cv_lasso <- cv.glmnet(X, y, alpha = 1)
+best_lambda <- cv_lasso$lambda.min
+
+lasso_mod <- glmnet(X, y, alpha = 1, lambda = best_lambda)
+
+coef(lasso_mod)
+```
+
+
+   Compare this model to the models you found with stepwise methods
+   above.
+
+LASSO zeroes out the weakest predictors and shrinks everything else, but still keeps the value, size, baths front and center. Compared to stepwise, it’s a bit more aggressive about bias‑variance tradeoff—dropping a couple more marginal terms in exchange for potentially better out‑of‑sample stability.
+
+6. Investigate the residuals and $R^2$ for the LASSO fit. Unfortunately, the
+   `summary()` command does not give us these values for LASSO models.
+   So we'll have to calculate them by hand (using definitions we already know
+   from Lecture 19). One way to do this is:
+
+   - Get the predictions of the LASSO model: use `predict(lasso_model, newx=X)`,
+     where `X` is the matrix of independent variable observations you
+     constructed for calling `cv.glmnet`.
+   - Get the residuals: subtract the predictions from the dependent variable
+     (`SALE_PRICE`).
+   - Get the SSR and SST (explained earlier in lecture 19):
+        - `SSR <- sum(residuals ^ 2)`
+        - `mean_sale_price <- mean(sales2020$SALE_PRICE)`
+        - `SST <- sum((sales2020$SALE_PRICE - mean_sale_price) ^ 2)`
+   - Compute $R^2 = 1 - SSR / SST$. (Note: this is the *un-adjusted* $R^2$.)
+   
+```{r}
+preds   <- predict(cv_lasso, newx = X, s = "lambda.min")
+resid   <- as.vector(y - preds)
+
+SSR         <- sum(resid^2)
+mean_price  <- mean(y)
+SST         <- sum((y - mean_price)^2)
+
+R2_lasso <- 1 - SSR / SST
+cat("Unadjusted R^2 for LASSO:", R2_lasso, "\n")
+
+
+plot(
+  y, resid,
+  xlab = "Actual Sale PRice",
+  ylab = "Residuals",
+  main = "LASSO Residuals vs. Sale Price"
+)
+abline(h = 0, col = "red", lty = 2)
+```
+
+
+   After all these calculations, do the following:
+
+   - Compare the $R^2$ for LASSO to previous models (use their un-adjusted $R^2$
+     values). Is the LASSO model better?
+   - Plot the residuals as a function of the `SALE_PRICE`. Note any patterns.
+
+
+The unadjusted R2 for LASSO (~0.80) sits below the full OLS (~0.84) and stepwise (~0.82), exactly as you’d expect from a penalized fit. The residuals fan out as sale price rises, so bigger homes have more spread in their errors.
+
+
+
+7. Make the following plot with your LASSO model (here called `m`):
+
+   `plot(m$glmnet.fit, xvar="lambda", label=TRUE)`
+
+   This plots the values of the coefficients of the model for different values
+   of $\lambda$ that were tried by `cv.glmnet`. Explain what this plot shows us.
+   Note the numbers above the plot, and the small numbers to the left of the
+   lines.
+   
+```{r}
+plot(
+  cv_lasso$glmnet.fit,
+  xvar  = "lambda",
+  label = TRUE
+)
+```
+
+
+The top numbers tell you how many variables remain nonzero at each lambda, and the little digits by each curve are the IDs of those variables. Strongest predictorsstay away from zero longest, while weaker ones drop out early as the lamda grows.
+

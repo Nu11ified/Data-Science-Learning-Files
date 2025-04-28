@@ -1,0 +1,64 @@
+---
+title: "Getting to Know Markdown"
+author: "Rachel Wilkerson"
+date: "2024-08-28"
+output:
+  pdf_document: default
+  html_document:
+    theme: cerulean
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Knit early and often!!** 
+
+**Save your file somewhere where you can find it in a reasonably tidy folder structure!** 
+
+1. Read in the dataset classProfiles.csv and generate a boxplot showing the distribution of each of the skills. Edit one or more of the visual aspects of this plot (Ex: change the color, add a title, change the ylim, add the outliers, make the x-axis labels vertical for a challenge in base R.)
+
+```{r}
+df <- read.csv("dat/classProfiles.csv")
+
+boxplot(df, col = "blue")
+```
+
+  
+2. Write at minimum two paragraphs about your goals for the class and for your work in data science more broadly. (No more than a page please.) This can be an elaboration on one element of the skills listed above. Tell me the story of how you came to be a fledgling data scientist. What made you sign up for this course? What brought you to Baylor? 
+
+(what follows below is a sample! Plz delete and write your own paragraphs!
+)
+### How I became a data scientist before there was such a thing
+
+1. I started out at BU as a pre med major after spending the summer at MD Anderson Cancer Center. I learned how to run Western blots, but I found I didn't love biology. 
+Later that year, I started working in a physics lab after waxing poetic about swirls in cups of tea. I studied chaos and complexity science and read everything I could find about the Santa Fe Insitute.
+
+1. I worked at Mission Waco and Gospel Cafe, and I felt the gulf between the questions I asked downtown and those I asked in the physics lab keenly. I started searching Google Scholar for paper on poverty and physics and found Nathan Eagle's work on human mobility from cell phone data. I tracked down that dataset and went to England to work with a similar data set studying the mathematics of epidemics.
+
+Currently, I'm wrestling with the gulf between human flourishing and online datified systems that seem designed for anything but. So I read a lot of Wendell Berry's [*Manifesto Mad Farmer Libeartion Front*](https://cales.arizona.edu/~steidl/Liberation.html)
+
+>So, friends, every day do something
+>that won’t compute.
+
+### art generated in R by Danielle Navarro
+![](fig/pollen_35_3538.jpg)
+
+3. Format your paragraphs with some markdown. For full credit you must use at least five of the following formatting elements:
+
+- An ordered list
+- An unordered list
+- A math formula
+- Bold/underlined/italicized text
+- An embedded link
+- A block quote
+- Sections and subsections
+- A table of contents. 
+ 
+Feel free to be creative with this! For example: block quote your personal manifesto, give me an ordered list of ideal elements of the perfect coding environment! (Again, my examples have been given above, but delete and fill in with your own!)
+
+4. (Optional but fun) Alter the theme in your YAML heading with Bootswatch
+<https://bookdown.org/yihui/rmarkdown/html-document.html#appearance-and-style>
+
+6. Knit to PDF and submit to Canvas!

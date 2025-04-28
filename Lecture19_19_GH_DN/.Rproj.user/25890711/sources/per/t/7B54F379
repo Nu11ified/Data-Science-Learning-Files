@@ -1,0 +1,27 @@
+{
+    "id": "7B54F379",
+    "path": "~/Downloads/Lecture19_19_GH_DN/modeling_19_inclass.Rmd",
+    "project_path": "modeling_19_inclass.Rmd",
+    "type": "r_markdown",
+    "hash": "203782022",
+    "contents": "",
+    "dirty": false,
+    "created": 1744210381780.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "chunk_output_type": "console",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "45,0",
+        "scrollLine": "6"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1744686473,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1744686473303,
+    "read_only": false,
+    "read_only_alternatives": []
+}

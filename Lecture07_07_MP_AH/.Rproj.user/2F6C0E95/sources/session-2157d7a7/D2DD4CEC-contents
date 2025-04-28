@@ -1,0 +1,56 @@
+---
+output: "pdf_document"
+editor_options: 
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65),
+  tidy=TRUE
+)
+```
+
+CSI 2300: Intro to Data Science
+
+In-Class Exercise 07:  Exploratory Data Analysis 
+
+
+The data for today's exercises are the Colorado Housing data used in the lecture.
+
+1. Download the data for 2019, and then load it into R.  How many variables are in each one?
+
+```{r}
+
+```
+
+
+
+2. As was covered in lecture, we need to strip the dollar signs and commas from the land value, building value, and sale price columns. Show the the complete calls to accomplish this task.
+
+
+3. Create a histogram for the number of bedrooms sold for the year 2019. This plot will look  right skewed. Why do you think this is? In order to focus on the smaller values, change the number of breaks in the bins, and limit the view of the data by focusing on left-hand range of data. Show your plot and code (only one line of code is needed).
+
+
+4. Modify the plot from the prior question to improve the title and x-axis label. These should make the plot understandable for a casual observer.
+
+
+5. For the 2019 data, there are houses being sold that were originally built over a  wide range of years. We want to investigate how  building standards have changed over the years. Create a histogram of the building year for homes with 1 full bathroom.  Repeat for homes with 2 full bathrooms and with 3 full bathrooms.  Comment on the similarities and differences among these three histograms.
+
+
+6. Create a side-by-side boxplot of the sale price against each number of bedrooms in the 2019 sales. Add labels and a title to the plot. Describe what you see in this plot.
+
+
+7. Filter the data to the three  cities in  Boulder County that had the most sales. Compare their housing prices with a side-by-side boxplot. Change the scale of the y-axis to be in thousands of dollars.
+
+
+8.  Investigate the relationship between the year a house was built and its sales price with a scatterplot. What options could be used to improve the plot? What does this plot tell you about the relationship between the year a house was built and its sales price?

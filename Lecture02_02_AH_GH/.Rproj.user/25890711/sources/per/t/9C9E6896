@@ -1,0 +1,27 @@
+{
+    "id": "9C9E6896",
+    "path": "~/Downloads/Lecture02_02_AH_GH/intro_02_lecture.Rmd",
+    "project_path": "intro_02_lecture.Rmd",
+    "type": "r_markdown",
+    "hash": "861194729",
+    "contents": "",
+    "dirty": false,
+    "created": 1737732051603.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "chunk_output_type": "console",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "324,46",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1737733319,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1737733319939,
+    "read_only": false,
+    "read_only_alternatives": []
+}

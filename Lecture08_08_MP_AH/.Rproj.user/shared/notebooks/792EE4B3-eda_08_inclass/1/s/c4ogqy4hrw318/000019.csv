@@ -1,0 +1,7 @@
+"0",""
+"0","# Filter data for the last 20 years"
+"0","water20 <- water[water$date > ""2000-01-01"", ]"
+"0","date20 <- as.Date(water20$date)"
+"0",""
+"0","# Plot percent_full over time"
+"0","plot(date20, water20$percent_full, type = ""l"", xlab = ""Year"", ylab = ""Percent Full (%)"")"

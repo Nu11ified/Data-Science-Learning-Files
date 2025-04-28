@@ -1,0 +1,29 @@
+---
+title: "Lecture04FakeHW"
+author: "Doug Nychka"
+date: "1/17/2021"
+output: pdf_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lubridate)
+```
+
+## Problem 1
+Load the COVID data set and create a subset that is Boulders 
+measured 'copies' 
+Do this  by the R code:
+
+```
+covid <- read.csv(file = "dat/CDPHE_COVID19_Wastewater_Dashboard_Data.csv", header = T)
+boulder_covid <- covid[covid$Utility == "Boulder", ]
+RNATest<- na.omit( boulder_covid$SARS_CoV_2_copies_L )
+```
+
+* (A) What are the median and  mean for these RNA data? 
+  Which is larger?
+  
+* (B) Plot a histogram of these data and locate the mean and median by vertical lines. (You can use the fields package function ```xline``` to to add the lines.)
+* (C) Do any of the values  seem to  be outliers, i.e. unusual, worthy of scrutiny?
+  

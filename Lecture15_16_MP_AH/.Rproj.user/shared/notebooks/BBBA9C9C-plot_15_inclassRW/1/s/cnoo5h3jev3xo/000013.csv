@@ -1,0 +1,7 @@
+"0",""
+"0",""
+"0",""
+"0","#m <- lm(log(covid_df$new_covid_cases)~log(covid_df$sars_rna_copies + 1))"
+"0",""
+"0","#p + geom_abline(intercept = coef(m)[1], slope = coef(m)[2])"
+"0",""

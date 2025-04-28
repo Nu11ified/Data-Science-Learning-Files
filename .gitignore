@@ -1,0 +1,49 @@
+# R-specific files
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj.user/
+.DS_Store
+
+# Session info
+.Rproj.user/sessions/
+
+# Packages
+/library
+
+# knitr and R markdown generated files
+*.utf8.md
+*.knit.md
+*_cache/
+/figure/
+/figures/
+* 중간고사.html
+* 기말고사.html
+* 기말고사.docx
+* 중간고사.docx
+
+
+# Temporary files
+*~
+\#*\#
+.#*
+*.swp
+*.tmp
+*.log
+
+# IDE and OS generated files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Compiled code
+*.o
+*.so
+*.dll
+
+# User-specific files
+/local/
+
+# RStudio files
+.Rproj.user/

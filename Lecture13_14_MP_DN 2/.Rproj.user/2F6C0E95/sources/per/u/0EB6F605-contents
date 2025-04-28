@@ -1,0 +1,37 @@
+library(lubridate)
+
+hour(boulder_ammonia$Date.Time)
+year(boulder_ammonia$Date.Time)
+month(boulder_ammonia$Date.Time)
+seconds(boulder_ammonia$Date.Time)
+
+feb_2_ammonia_idx <- which(month(boulder_ammonia$Date.Time) == 2 & day(boulder_ammonia$Date.Time) == 1)
+feb_2_ammonia <- boulder_ammonia[feb_2_ammonia_idx,]
+
+anotherfeb_2_ammonia <- boulder_ammonia[boulder_ammonia$Date.Time < '2019-02-01 23:59:59 UTC' & 
+                  boulder_ammonia$Date.Time >= '2019-02-01 00:00:00 UTC',]
+
+dim(feb_2_ammonia)
+dim(anotherfeb_2_ammonia)
+
+
+head(starwars)
+View(starwars)
+
+sw1 <- starwars[1,]
+sw2 <- starwars[2,]
+sw12 <- rbind(sw1, sw2)
+
+stopName = "Jar Jar Binks"
+sentinelValue = TRUE
+i <- 2
+while (sentinelValue){
+  row_to_add <- starwars[i,]
+  if(starwars$name[i] == stopName){
+    sentinelValue = FALSE
+  } else {
+    sw1 <- rbind(sw1, row_to_add) 
+  i <- i + 1 
+  }
+}
+

@@ -1,0 +1,3 @@
+"0",""
+"0","# Create a blank plot with the correct dimensions"
+"0","plot(1:365, seq(50, 100, len = 365), type = ""n"", xlab = ""Days of the Year"", ylab = ""Percent Full (%)"", main = ""Texas Reservoirs Percent Full (2016 - 2020)"")"

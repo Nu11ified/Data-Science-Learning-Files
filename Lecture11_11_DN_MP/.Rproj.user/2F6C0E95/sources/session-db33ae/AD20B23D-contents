@@ -1,0 +1,81 @@
+---
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65)
+)
+```
+
+#  CSI 2300: Intro to Data Science
+
+## In-Class Exercise 11: Data wrangling and cleaning
+
+1.  Take a look at the script  
+`readAudiLecture11.R` that creates the final **AudiA4** data frame. 
+
+In the first line to read in the raw data,
+``` 
+AudiA4Raw <- scan("dat/rawCars.txt", what = "a", sep= "\n")
+```
+what is does ```sep="\n"``` do? What would happen if this was omitted?
+
+
+
+2. See lines 56 to 62 in `readAudiLecture11.R` to explain how the variable  "distance to dealership" is being extracted from the raw data. One hint on understanding what is happening in a loop is to set `k <- 1`, and then run the lines inside of the loop.
+
+
+
+3. **grep** refers to a UNIX function designed to do all kinds of matching of strings and uses some  characters that  have special meaning (known as a grep  *meta-character*). In particular the ```$```  by default in `grep` is used to match the end of a line.  Find the place in the `readAudiLecture11.R` script where the asking price is extracted, and explain how the dollar amount is matched as a dollar sign and not as a special `grep` meta-charcter. 
+
+
+4. Load the `AudiA4.rda` data, and plot the asking price (y axis) against mileage (x axis), and
+color the points by the model year.  Is there a straight line
+relationship between price and mileage? Do you think adjusting
+for both year and mileage will make much difference in predicting
+the asking price?
+
+To create a set of colors based on a variable here is one way
+```{r eval=FALSE}
+library(fields)
+# this will map the years to 17 colors on the rainbow color range.
+yearColors <- color.scale(AudiA4$year, col = rainbow(17))
+```
+
+Now in your plot commands use `col = yearColors` in the plot function to get symbols coded by these years. Seventeen colors may be too many, so you can experiment with the number of colors and the colors. 
+
+
+
+5. For your plot in 4. are there any cars you would consider to be  outliers?  Any potential bargains?
+
+
+6. Load the Corpus Christi radiosonde record, `CorpusCristi.rda`. 
+Plot the **temp**, **windSpeed** and **windDir** variables at the *near surface* pressure level
+ (the one equal to 925 mb) over time. To obtain the observations at 925 mb, one way is to use the logical
+ 
+ `ind <- CorpusCristi$pressure == 925 `.
+
+ Comment on any unusual values or patterns.
+
+
+7. Do the missing values in temperature appear to be random across pressure levels, or do they follow a pattern? 
+
+
+
+
+
+

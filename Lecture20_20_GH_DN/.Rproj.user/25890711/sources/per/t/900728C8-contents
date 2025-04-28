@@ -1,0 +1,188 @@
+---
+output: "pdf_document"
+editor_options: 
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#", 
+  cache = FALSE,  
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65)
+)
+```
+
+# CSI 2300: Intro to Data Science
+
+## In-Class Exercise 20: Modeling -- Multiple Linear Regression
+
+For this lecture, we'll return to another dataset we've used before; the Boulder
+Housing dataset^[https://www.bouldercounty.org/property-and-land/assessor/sales/recent/].
+
+1. Load the 2020 Boulder housing dataset in (`boulder-2020-residential_sales.csv`).
+   Create several new numeric variables using the code given below. What are
+   these new variables?
+
+```{r}
+sales2020 <- read.csv(file="boulder-2020-residential_sales.csv", 
+                      header=T, stringsAsFactors=F)
+
+# Remove $ and , (dollar signs and commas) from everywhere, then parse as
+# integer. In the pattern, the vertical bar "|" means "or".
+to_remove_pattern <- '\\$|,'
+sales2020$BLDG_VALUE <- as.integer(gsub(to_remove_pattern, '', sales2020$BLDG_VALUE))
+sales2020$LAND_VALUE <- as.integer(gsub(to_remove_pattern, '', sales2020$LAND_VALUE))
+sales2020$SALE_PRICE <- as.integer(gsub(to_remove_pattern, '', sales2020$SALE_PRICE))
+
+# add together all baths
+sales2020$total_baths = sales2020$FULL_BATHS +
+                        sales2020$THREE_QTR_BATHS * 0.75 +
+                        sales2020$HALF_BATHS * 0.5
+
+# add together all square footage
+sales2020$total_sqft = sales2020$STUDIO_SQFT +
+                       sales2020$GARAGE_SQFT +
+                       sales2020$ABOVE_GROUND_SQFT +
+                       sales2020$FINISHED_BSMT_SQFT +
+                       sales2020$FINISHED_GARAGE_SQFT +
+                       sales2020$UNFINISHED_BSMT_SQFT
+```
+
+2. Build a multiple linear regression model to predict the `SALE_PRICE`
+   (dependent variable) using the following  independent variables:
+
+    - `BLDG_VALUE`,
+    - `LAND_VALUE`,
+    - `total_baths`,
+    - `total_sqft`, and
+    - `BLDG1_YEAR_BUILT`
+    
+```{r}
+# Build the model Error in eval(mf, parent.frame()) : object 'sales2020' not found
+model <- lm(SALE_PRICE ~ BLDG_VALUE + LAND_VALUE + total_baths + total_sqft + BLDG1_YEAR_BUILT, 
+            data = sales2020)
+summary(model)
+
+```
+
+
+What do your coefficients look like? Do they make sense?  When discussing this,
+consider both the coefficients' values and their signs.
+
+The intercept is negative, which doesn't make sense in the context of this
+problem.  This is because the model is not valid for houses with zero value.
+
+
+
+3. Using the model you just built, construct some predictions of prices for the
+   following (theoretical) houses:
+
+| House  | BLDG_VALUE | LAND_VALUE | total_baths | total_sqft | BLDG1_YEAR_BUILT |
+|--------|------------|------------|-------------|------------|------------------|
+|   A    | 400000     |    100000  | 3           | 3000       | 1995             |
+|   B    | 200000     |     50000  | 1           | 1500       | 2005             |
+|   C    | 2000000    |   3000000  | 9           | 20000      | 1800             |
+
+First, create a new data frame using these values of the new homes.  Be sure to
+use the exact same variable names for each of the columns that are used in the
+original data frame.   Then, use the `predict` function with the arguments as
+follows: `predict(your_model, new_dataframe)`
+
+```{r}
+# Create a new data frame with the theoretical houses
+theoretical_houses <- data.frame(
+  BLDG_VALUE = c(400000, 200000, 2000000),
+  LAND_VALUE = c(100000, 50000, 3000000),
+  total_baths = c(3, 1, 9),
+  total_sqft = c(3000, 1500, 20000),
+  BLDG1_YEAR_BUILT = c(1995, 2005, 1800)
+)
+
+predicted_prices <- predict(model, newdata = theoretical_houses)
+predicted_prices
+
+```
+
+
+
+4. Though we can use our linear model to make predictions for any type of house
+   with (e.g.) any number of baths, such predictions don't always make sense.
+   For which of the theoretical houses listed in the previous question does it
+   make sense for our model to make a prediction, and why?
+
+
+House A and B have values within the range of the original data, so predictions are likely reasonable.
+House C has extremely high value which is  outside the range of the training data, so the prediction may not be reliable.
+
+
+5. Consider all the variables we have looked at for this problem (independent
+   and dependent). Find the correlation between each of the independent
+   variables and the dependent variable. Then find the correlation between each
+   pair of independent variables. Which do you find are the most strongly
+   correlated (close to +/-1) and least strongly correlated (close to 0)?
+   
+```{r}
+vars <- sales2020[, c("SALE_PRICE", "BLDG_VALUE", "LAND_VALUE", "total_baths", "total_sqft", "BLDG1_YEAR_BUILT")]
+
+cor_matrix <- cor(vars, use = "complete.obs")
+cor_matrix
+```
+
+The variable most strongly correlated with sale price is land value, followed by bldg value. Among the independent variables, total_baths and total_sqft are highly correlated with each other, which could indicate potential correlated if both are included in a model.
+
+6. "Occam's Razor"^[https://en.wikipedia.org/wiki/Occam%27s_razor] says that
+   simpler theories are preferable to complex ones, if both have the ability to
+   explain. When used in modeling, this principle leads us to prefer simple
+   models (using fewer variables) that are still useful (i.e., still make
+   reasonable predictions).
+   
+```{r}
+simple_model <- lm(SALE_PRICE ~ BLDG_VALUE + total_sqft, data = sales2020)
+summary(simple_model)
+```
+
+
+   With Occam's Razor in mind, using the results from the previous question,
+   choose a *subset* of the independent variables that are *most* correlated with
+   the dependent variable and *least* correlated with each other. Use them to
+   make a new linear model. Compare the coefficients and fit (e.g. adjusted $R^2$) for
+   this model with the previous model that used more independent variables.
+   
+The simpler model using only bldg value and total sqft explains the variance in sail price (adjusted R-squared = 0.5118), with both predictors highly significant. Compared to the full model, this simpler model is easier to interpret. 
+
+
+7. Calculate the residuals, and for each of the independent variables you used
+   in your most recent model, make a plot of the residuals (y-axis) versus the
+   independent variable (x-axis). Look carefully. Do there appear to be any
+   patterns between the residuals and any of the independent variables? If there
+   are any patterns, what might that tell you about the data?
+   
+```{r}
+sales2020$simple_resid <- residuals(simple_model)
+
+par(mfrow = c(1, 2)) # 2 plots side by side
+
+plot(
+  sales2020$BLDG_VALUE, sales2020$simple_resid,
+  xlab = "BLDG_VALUE", ylab = "Residuals",
+  main = "Residuals vs BLDG_VALUE"
+)
+abline(h = 0, col = "red")
+
+plot(
+  sales2020$total_sqft, sales2020$simple_resid,
+  xlab = "total_sqft", ylab = "Residuals",
+  main = "Residuals vs total_sqft"
+)
+abline(h = 0, col = "red")
+```
+
+
+There do not appear to be strong patterns the points are fairly randomly scattered around zero. However, there is some spread and a few large outliers, especially at higher values, which suggests that the model may not fit extremely high-value. This indicates that the relationship between the predictors and sale price is not linear for all ranges.

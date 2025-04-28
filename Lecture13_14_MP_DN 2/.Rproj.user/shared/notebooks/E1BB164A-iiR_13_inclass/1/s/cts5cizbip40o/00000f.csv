@@ -1,0 +1,2 @@
+"0","# Create a matrix"
+"0","mat <- matrix(1:24, nrow = 6, ncol = 4)"

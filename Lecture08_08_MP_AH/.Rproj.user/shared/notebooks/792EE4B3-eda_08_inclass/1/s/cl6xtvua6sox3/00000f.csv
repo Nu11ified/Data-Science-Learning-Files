@@ -1,0 +1,8 @@
+"0","#The `percent_full` variable is the ratio of conservation storage to conservation capacity expressed as a percentage.   Visualize  how full Texas  reservoirs have been since the data began to be recorded. In other words, plot the percent full over time. What are your observations about this data?"
+"0",""
+"0","plot(water$date, water$percent_full, type = ""l"", xlab = ""Year"", ylab = ""Percent Full (%)"")"
+"2","Warning: NAs introduced by coercion"
+"2","Warning: no non-missing arguments to min; returning Inf"
+"2","Warning: no non-missing arguments to max; returning -Inf"
+"2","Error in plot.window(...) : need finite 'xlim' values
+"

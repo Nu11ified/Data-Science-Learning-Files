@@ -1,0 +1,2 @@
+"0","# Create a blank plot"
+"0","plot(1:365, seq(50, 100, len=365), type = ""n"", xlab = ""Days of the Year"", ylab = ""Percent Full (%)"")"
