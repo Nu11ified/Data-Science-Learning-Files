@@ -69,7 +69,14 @@ We'll break this down into a number of steps, as usual.
    - Check that the `Sex` variable is indeed a factor.
 
 
-\ 
+```{r}
+#add abalone dataset
+load("abalone.rda")
+
+#check that sex variable factor
+is.factor(abalone$Sex)
+```
+
 
 2. Start with the code below. First, add `{r}` to the triple backtick. 
    Then add a few lines to create a random split of the abalone dataset
@@ -91,6 +98,16 @@ train_size <- 1253
 # written as one line of code each, using what we have so far)
 ```
 
+```{r}
+n <- nrow(abalone)
+
+p <- sample(1:n) 
+
+train_size <- 1253
+
+train <- abalone[p[1:train_size],] 
+test <- abalone[p[(train_size+1):n],]
+```
 
 \ 
 
@@ -114,7 +131,17 @@ for (v in 1:ncol(abalone)) {
 }
 ```
 
-\ 
+```{r}
+dep_ndx <- which(colnames(abalone) == 'Sex') # index of dependent variable
+
+for (v in 1:ncol(abalone)) { # look through each column
+    if (v == dep_ndx) { next } # if V is sex skit it
+    s <- sd(train[,v]) # implement standard deviation on training data
+    train[,v] <- train[,v] / s # each value in the current column of the train dataset and divides it by the standard deviation
+    test[,v]  <- test[,v] / s # same as above, to ensure no data leakage 
+}
+```
+
 
 4. Let's try classifying the `Sex` of the abalone observations using a nearest
    neighbor classifier. Remember that when using `knn(...)`, you should leave
@@ -130,6 +157,16 @@ for (v in 1:ncol(abalone)) {
       this tell us?
 
 
+```{r}
+library(class)
+
+train_predictions <- knn(train=train[,-1], test=train[,-1], cl=train[,1])
+
+test_predictions <- knn(train=train[,-1], test=test[,-1], cl=train[,1])
+
+confusionMatrix(train[,1], train_predictions)
+confusionMatrix(test[,1], test_predictions)
+```
 
 \ 
 
@@ -163,7 +200,26 @@ plot(k_vals, test_accuracy, main="Test")
 ```
 
 
-\ 
+```{r}
+# pre-declare our results vectors
+train_accuracy <- test_accuracy <- NULL
+dep_ndx <- which(colnames(train) == 'Sex')
+k_vals <- seq(1, 63, by=2)
+for (k in k_vals) {
+    train_predictions <- knn(train[,-dep_ndx], train[,-dep_ndx], train[,dep_ndx], k=k)
+    test_predictions <- knn(train[,-dep_ndx], test[,-dep_ndx], train[,dep_ndx], k=k)
+    train_accuracy <- append(train_accuracy, mean(train$Sex == train_predictions))
+    test_accuracy <- append(test_accuracy, mean(test$Sex == test_predictions))
+}
+
+par(mfrow=c(1,2))
+plot(k_vals, train_accuracy, main="Train")
+plot(k_vals, test_accuracy, main="Test")
+```
+
+
+Model is overfitting when K is small, the training accuracy is much higher. When k is too big the model underfits the test accuracy starts to drop again.
+  
 
 6. Let's try building a tree classifier on the training data. 
    - Load the `rpart` library.
