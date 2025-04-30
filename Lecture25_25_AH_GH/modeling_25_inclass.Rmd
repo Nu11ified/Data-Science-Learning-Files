@@ -1,0 +1,133 @@
+---
+output: "pdf_document"
+editor_options:
+  chunk_output_type: console
+urlcolor: blue
+fontsize: 12pt
+header-includes:
+- \usepackage{caption}
+- \captionsetup[figure]{labelformat=empty}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#",
+  cache = FALSE,
+  collapse = TRUE,
+  error = TRUE,
+  tidy.opts=list(width.cutoff=65)
+)
+```
+
+```{r, echo=F}
+# get reproducible results by setting the random number seed
+set.seed(1)
+```
+
+# CSI 2300: Intro to Data Science
+
+## In-Class Exercise 25: Model Validation
+
+1. Load in the met tower data used in the lecture notes using the code below, and plot the wind speed over time. Describe what you see in the wind speed time series.
+
+```{r}
+suppressMessages(library(lubridate))
+load("kenn_dec2013.Rda")
+
+kenn_dec2013$Date.Time.UTC <- mdy_hms(kenn_dec2013$Date.Time.UTC)
+plot(kenn_dec2013$Date.Time.UTC, kenn_dec2013$Wind.Speed.MPH, type = "l", 
+     xlab = "Date", ylab = "Wind Speed (mph)", 
+     main = "Kennewick December 2013 Wind Speed")
+```
+
+
+2.  In the lecture, the difference between independent and dependent observations was described.  Are the wind speed observations more likely to be independent or dependent?  Explain your answer.
+
+The wind speed observations are likely to be dependent. This is because wind speed can be influenced by various factors such as weather patterns, time of day, and seasonal changes. As a result, the wind speed at one time point may be correlated with the wind speed at another time point, leading to a lack of independence in the observations.
+
+
+3.   If the observations are dependent, then one way to create the train/test sets are to split the data frame in such a way that the order can be preserved.  
+    - Do this here by using the first 50\% of the data frame as the training set and the second half of the data frame as the testing set. 
+    - The goal is to model wind speed, and we can't build a model using the dates, so  remove the two columns containing dates from both sets.
+    
+
+```{r}
+train_index <- 1:4416
+test_index <- 4417:nrow(kenn_dec2013)
+
+train_frame <- kenn_dec2013[train_index,-c(1,7)]
+test_frame <- kenn_dec2013[test_index, -c(1,7)]
+```
+
+
+4. All decisions about modeling wind speed should be made using only the information contained in the training set.   Construct pairwise scatterplots of wind speed against each of the other numeric variables in the training data frame.  You should have 6 figures, and they can be organized into one panel using the command `par(mfrow=c(2,3))`. Which variables appear to be most strongly related to wind speed?
+
+```{r}
+par(mfrow=c(2,3))
+
+for (col in colnames(train_frame)[-5]) {
+  plot(train_frame[, col], train_frame$Wind.Speed.MPH, col=rgb(0, 0, 0, .1),
+       xlab = col, ylab = "Wind Speed (mph)", 
+       main = paste("Wind Speed vs", col))
+}
+
+```
+
+The barometric pressure and windspeed seem to have a inverse correlation. 
+
+5.  Perform backward selection and obtain the model based on the BIC criteria (setting `k=log(n)`) and another model based a stonger penalty criteria (setting `k=n`), call it MIC for "my information criteria".  Which variables are selected for each model?  (See Lecture 21 for reference on backward selection.)
+
+```{r}
+m <- lm(Wind.Speed.MPH ~ ., data = train_frame)
+
+bic <- step(m, direction = "backward", k = log(nrow(train_frame)), trace = 0)
+
+summary(bic)
+
+mic <- step(m, direction = "backward", k = nrow(train_frame), trace = 0)
+
+summary(mic)
+
+```
+
+The BIC model used the following variables:
+Barometric.Pressure.INHG
+Relative.Humidity.PT
+Temperature.F
+Wind.Direction.DEG
+Peak.Speed.MPH
+Peak.Direction.DEG
+
+The MIC model only used one variable:
+Peak.Speed.MPH
+
+6.  Use the two models fitted on the training dataset to make predictions for the testing set.  Replace the `xx`'s in the table below with the $R^2$, RMSE, and MAE computed on the testing data for each of the two models from \#5.  RMSE and MAE can be computed from the residuals as `sqrt(mean(residuals^2))` and `mean(abs(residuals))`, respectively. (See in-class exercises for Lecture 20 if you need to reference making predictions.)
+
+|   Model  | $R^2$ |  RMSE |       MAE | 
+|--------|-------   |-------   |--------|
+|   MIC  |  .986    |  1.508   |  1.083  |
+|   BIC  |  .985    |  1.571   |  1.123  |
+
+
+```{r}
+test_mic <- predict(mic, newdata = test_frame)
+test_bic <- predict(bic, newdata = test_frame)
+
+cor(test_mic, test_frame$Wind.Speed.MPH)^2
+cor(test_bic, test_frame$Wind.Speed.MPH)^2
+
+errors_mic <- test_frame$Wind.Speed.MPH - test_mic
+errors_bic <- test_frame$Wind.Speed.MPH - test_bic
+
+sqrt(mean(errors_mic^2))
+sqrt(mean(errors_bic^2))
+
+mean(abs(errors_mic))
+mean(abs(errors_bic))
+```
+
+
+
+7.  Which model makes better predictions in the testing set?
+
+The model with the lower RMSE and MAE values is considered to make better predictions. In this case, we would compare the RMSE and MAE values from both models (MIC and BIC) to determine which one performs better on the testing set. The model with the lower values for both metrics would be preferred.
