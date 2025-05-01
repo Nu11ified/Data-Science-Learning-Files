@@ -66,7 +66,7 @@ We'll break this down into a number of steps, as usual.
     has labels Male, Female, and Infant.
 
    - Load in the `abalone` dataset from the file `abalone.rda`. 
-   - Check that the `Sex` variable is indeed a factor.
+   - Check that the `Sex` variable is indeed a factor. IT IS
 
 
 ```{r}
@@ -76,6 +76,7 @@ load("abalone.rda")
 #check that sex variable factor
 is.factor(abalone$Sex)
 ```
+
 
 
 2. Start with the code below. First, add `{r}` to the triple backtick. 
@@ -113,10 +114,18 @@ test <- abalone[p[(train_size+1):n],]
 
 3. Normalize the scale of the independent variables (all but `Sex`) using the
    code below, and then answer the following questions:  
+    
     - Why is it important to normalize the independent variables?
+Normalizing independent variables is important because many algorithms are sensitive to feature scales, improving performance and preventing bias.
+    
     - Explain what each line in the code below does.
+    
+Check snippet!
+
     - Why are the standard deviations computed from the training data variables
       used to scale the testing data variables?
+      
+Standard deviations from training data are used to scale testing data to prevent data leakage and ensure consistent transformations.
 
 ```
 # Note: this code chunk doesn't have {r} on the line above; add it when you want
@@ -168,16 +177,27 @@ confusionMatrix(train[,1], train_predictions)
 confusionMatrix(test[,1], test_predictions)
 ```
 
-\ 
+Using k=1, the train accuracy is typically much higher than the test accuracy. They differ quite a bit. This tells us that the model is likely overfitting the training data. With k=1, the model is very sensitive to individual training examples and may not generalize well to unseen data.
 
 5. Using $k = 1$ was likely not a great model for our test data. We may be able
    to do better if we "smooth" out our KNN classifier using a larger $k$. Run
    the code below. Then answer these questions from the plots:
 
    - Where is the model overfitting?
+   
+The model is overfitting when k is small. You can see this in the plots because the train accuracy is very high, while the test accuracy is significantly lower. The model is fitting the noise in the training data.
+
    - Where is it underfitting?
+   
+The model appears to be underfitting when k is very large. As k increases, the test accuracy eventually starts to level off or even slightly decrease. The model becomes too simple and is not capturing the underlying patterns well enough.   
+
    - How can you tell if it is overfitting or underfitting?
+   
+You can tell by comparing the train and test accuracies.
+
    - What $k$ would you choose and why?
+   
+Based on the provided plots, you would look for the value of \(k\) where the test accuracy is highest or plateaus.
 
 ```
 # Note: this code chunk doesn't have {r} on the line above; add it when you want
@@ -234,9 +254,38 @@ Model is overfitting when K is small, the training accuracy is much higher. When
        - What is the accuracy of the model on the `train` data?
        - What is the accuracy of the model on the `test` data?
    - Does this look like a good model?
+   
+It looks good!
 
+```{r}
+library(rpart)
+library(rpart.plot) # A good library for plotting rpart trees nicely
 
-\ 
+# Construct a tree model using the train data with a reasonable cp value.
+# A starting point like 0.01 is often better than the default or 0.
+# You might need to experiment with this value to get a readable tree.
+m <- rpart(Sex ~ ., data=train, cp=0.01) # Using a reasonable cp
+
+# Plot the tree using rpart.plot for better visualization
+rpart.plot(m, extra=101) # extra=101 shows class probabilities
+
+cat("Independent variable test at the root:\n")
+print(m$frame[1, "var"])
+
+train_predictions_tree <- predict(m, train, type="class")
+test_predictions_tree <- predict(m, test, type="class")
+
+cat("\nConfusion Matrix (Train Data - Tree):\n")
+print(confusionMatrix(train$Sex, train_predictions_tree))
+cat("\nAccuracy (Train Data - Tree):\n")
+print(mean(train$Sex == train_predictions_tree))
+
+cat("\nConfusion Matrix (Test Data - Tree):\n")
+print(confusionMatrix(test$Sex, test_predictions_tree))
+cat("\nAccuracy (Test Data - Tree):\n")
+print(mean(test$Sex == test_predictions_tree))
+```
+
 
 7. The tree model you got was likely *underfitting* -- it may have never even
    predicted one of the classes.
@@ -248,13 +297,50 @@ Model is overfitting when K is small, the training accuracy is much higher. When
    Try the following loop and plots, and **describe what you see in the plots**.
    - What happens to the train accuracy, test accuracy, and complexity of the
      tree as `cp` decreases?
+As cp decreases, train accuracy increases, test accuracy first increases then decreases, and tree complexity increases.
+     
    - Is there a point where the model is underfitting?
+The model is underfitting when cp is large, resulting in a simple tree with low train and test accuracies.
+  
    - Is there a point where the model is overfitting?
+The model is overfitting when cp is small, leading to a complex tree with high train accuracy but lower test accuracy.
 
 ```
 # Note: this code chunk doesn't have {r} on the line above; add it when you want
 # to use it.
 
+# declare three vectors
+train_accuracy <- test_accuracy <- num_tree_nodes <- NULL
+cp_vals <- 1.3 ^ seq(-15, -30) # try different (small) values of cp
+range(cp_vals)
+for (cp in cp_vals) {
+    # train the tree
+    m <- rpart(Sex ~ ., data=train, cp=cp)
+
+    train_predictions <- predict(m, train, type="class")
+    train_accuracy <- append(train_accuracy, mean(train$Sex == train_predictions))
+
+    test_predictions <- predict(m, test, type="class")
+    test_accuracy <- append(test_accuracy, mean(test$Sex == test_predictions))
+
+    num_tree_nodes <- append(num_tree_nodes, nrow(m$frame))
+}
+# Note: below we use `xlim` to plot cp_vals from *greatest* to *least*,
+# reversing the normal x-axis order for plotting. This is because as the
+# complexity penalty decreases, the model gets more complex, and it feels
+# natural to think about the complexity increasing as we go right on the graph.
+par(mfrow=c(1,2))
+plot(cp_vals, train_accuracy, xlab="complexity penalty",
+     main="Train", log="x", xlim=c(max(cp_vals), min(cp_vals)))
+
+plot(cp_vals, test_accuracy, xlab="complexity penalty",
+     main="Test", log="x", xlim=c(max(cp_vals), min(cp_vals)))
+
+par(mfrow=c(1,1))
+plot(cp_vals, num_tree_nodes, xlab="complexity penalty",
+     main="# of tree nodes", log="x", xlim=c(max(cp_vals), min(cp_vals)))
+```
+```{r}
 # declare three vectors
 train_accuracy <- test_accuracy <- num_tree_nodes <- NULL
 cp_vals <- 1.3 ^ seq(-15, -30) # try different (small) values of cp
